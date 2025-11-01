@@ -17,9 +17,9 @@ import dj_database_url
 if os.path.isfile("env.py"):
     import env
 
-# This reference to env removes an IDE "unused import" error
-# env is imported so the interpreter runs it and creates environment variables
-env
+    # Reference env remove IDE "unused import" error
+    env
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
