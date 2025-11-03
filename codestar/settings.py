@@ -14,12 +14,16 @@ from pathlib import Path
 import os
 import dj_database_url
 
-if os.path.isfile("env.py"):
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
+
+is_dev_env = os.path.isfile("env.py")
+if is_dev_env:
     import env
 
-    # Reference env remove IDE "unused import" error
+    DEBUG = True
+    # Reference env to remove IDE "unused import" error
     env
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,9 +34,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
 
 ALLOWED_HOSTS = [
     ".herokuapp.com",
