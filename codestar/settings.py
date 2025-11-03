@@ -17,13 +17,12 @@ import dj_database_url
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+# Set up for development environment
 is_dev_env = os.path.isfile("env.py")
 if is_dev_env:
-    import env
+    import env  # noqa: F401 - Ignore unreferenced import warning
 
     DEBUG = True
-    # Reference env to remove IDE "unused import" error
-    env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
