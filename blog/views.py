@@ -8,3 +8,5 @@ from .models import Post
 class PostList(generic.ListView):
     PUBLISHED = 1
     queryset = Post.objects.filter(status=PUBLISHED)
+    template_name = "blog/index.html"
+    paginate_by = 6
