@@ -1,11 +1,10 @@
 from django.shortcuts import render, get_object_or_404
 from django.views import generic
-from .models import Post
+from .models import Post, PUBLISHED
 
 
 # Create your views here.
 class PostList(generic.ListView):
-    PUBLISHED = 1
     queryset = Post.objects.filter(status=PUBLISHED)
     template_name = "blog/index.html"
     paginate_by = 6
@@ -24,7 +23,7 @@ def post_detail(request, slug):
 
     :template:`blog/post_detail.html`
     """
-    queryset = Post.objects.filter(status=1)
+    queryset = Post.objects.filter(status=PUBLISHED)
     post = get_object_or_404(queryset, slug=slug)
 
     return render(request, "blog/post_detail.html", {"post": post})
