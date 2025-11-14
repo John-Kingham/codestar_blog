@@ -42,14 +42,19 @@ def post_detail(request, slug):
 
 
 def save_comment(request, post):
+    """
+    Extract a `Comment` from a request and save it to the database.
+    Adds a success message to `messages` if the save was successful.
+
+    Args:
+        request (HttpRequest): The HTTP request.
+        post (Post): The `Comment`'s related blog post.
+    """
     comment_form = CommentForm(data=request.POST)
     if comment_form.is_valid():
         comment = comment_form.save(commit=False)
         comment.author = request.user
         comment.post = post
         comment.save()
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            "Comment submitted and awaiting approval",
-        )
+        message = "Comment submitted and awaiting approval"
+        messages.add_message(request, messages.SUCCESS, message)
