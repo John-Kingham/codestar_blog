@@ -24,16 +24,16 @@ function addEditEventListeners() {
  * Add event listeners to handle Delete Comment button clicks.
  */
 function addDeleteEventListeners() {
-    const deleteModal = new bootstrap.Modal(
+    const deleteConfirmModal = new bootstrap.Modal(
         document.getElementById("deleteModal")
     );
-    const deleteButtons = document.getElementsByClassName("btn-delete");
-    const deleteConfirm = document.getElementById("deleteConfirm");
-    for (const deleteButton of deleteButtons) {
-        deleteButton.addEventListener("click", function (e) {
+    const deleteBtns = document.getElementsByClassName("btn-delete");
+    const confirmDeleteBtn = document.getElementById("deleteConfirm");
+    for (const deleteBtn of deleteBtns) {
+        deleteBtn.addEventListener("click", function (e) {
             const commentId = e.target.getAttribute("comment_id");
-            deleteConfirm.href = `delete_comment/${commentId}`;
-            deleteModal.show();
+            confirmDeleteBtn.href = `delete_comment/${commentId}`;
+            deleteConfirmModal.show();
         });
     }
 }

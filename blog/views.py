@@ -79,6 +79,10 @@ def comment_edit(request, slug, comment_id):
             edited comment. The request's user is the comment's author.
         slug (str): A URL slug containing the ID of the edited comment's post.
         comment_id (int): The ID of the edited comment.
+
+    Returns:
+        HttpResponseRedirect: Redirects to the post details page for the
+        comment's blog post.
     """
     if request.method == "POST":
         comment = get_object_or_404(Comment, pk=comment_id)
@@ -98,10 +102,19 @@ def comment_delete(request, slug, comment_id):
     """
     Delete a comment and then reload the post details page.
 
+    If the request's user is the comment's author, the comment's database
+    record will be deleted and a message will be added to `messages`.
+
+    Otherwise, an error message will be added to `messages`.
+
     Args:
-        request (HTTPRequest): A request.
+        request (HTTPRequest): A request where `user` is the comment's author.
         slug (str): A URL slug containing the comment's blog post ID.
         comment_id (int): The comment's ID.
+
+    Returns:
+        HttpResponseRedirect: Redirects to the post details page for the
+        comment's blog post.
     """
     comment = get_object_or_404(Comment, pk=comment_id)
     if comment.author == request.user:
