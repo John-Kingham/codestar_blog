@@ -87,9 +87,27 @@ def comment_edit(request, slug, comment_id):
             comment = comment_form.save(commit=False)
             comment.approved = False
             comment.save()
-            message = "Comment updated."
-            messages.add_message(request, messages.SUCCESS, message)
+            messages.add_message(request, messages.SUCCESS, "Comment updated.")
         else:
             message = "Error updating comment."
             messages.add_message(request, messages.ERROR, message)
+    return HttpResponseRedirect(reverse("post_detail", args=[slug]))
+
+
+def comment_delete(request, slug, comment_id):
+    """
+    Delete a comment and then reload the post details page.
+
+    Args:
+        request (HTTPRequest): A request.
+        slug (str): A URL slug containing the comment's blog post ID.
+        comment_id (int): The comment's ID.
+    """
+    comment = get_object_or_404(Comment, pk=comment_id)
+    if comment.author == request.user:
+        comment.delete()
+        messages.add_message(request, messages.SUCCESS, "Comment deleted.")
+    else:
+        message = "You can only delete your own comments."
+        messages.add_message(request, messages.ERROR, message)
     return HttpResponseRedirect(reverse("post_detail", args=[slug]))
