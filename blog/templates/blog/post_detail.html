@@ -63,9 +63,10 @@
             {{ comment.body | linebreaks }}
             </div>
             {% if not comment.approved and comment.author == user %}
-            <p class="approval">
-            This comment is awaiting approval
-            </p>
+            <p class="approval">This comment is awaiting approval</p>
+            {% endif %}
+            {% if user.is_authenticated and comment.author == user%}
+            <button class="btn btn-edit" comment_id="{{ comment.id }}">Edit</button>
             {% endif %}
         </div>
         <!-- comments for loop ends here -->
@@ -81,7 +82,7 @@
             <form id="commentForm" method="POST" style="margin-top: 1.3em">
                 {{ comment_form | crispy }}
                 {% csrf_token %}
-                <button id="submissionButton" type="submit" 
+                <button id="submitButton" type="submit" 
                     class="btn btn-signup btn-lg">Submit</button>
             </form>
             {% else %}
@@ -93,3 +94,9 @@
 </div>
 
 {% endblock content %}
+
+{% block extras %}
+
+<script src="{% static "js/comments.js" %}"></script>
+
+{% endblock extras %}

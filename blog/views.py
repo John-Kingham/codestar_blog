@@ -1,8 +1,9 @@
 from django.contrib import messages
-from django.shortcuts import render, get_object_or_404
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, render, reverse
 from django.views import generic
 from .forms import CommentForm
-from .models import Post, PUBLISHED
+from .models import Comment, Post, PUBLISHED
 
 
 # Create your views here.
@@ -30,7 +31,7 @@ def post_detail(request, slug):
     comments = post.comments.all().order_by("-created_on")
     comment_count = post.comments.filter(approved=True).count()
     if request.method == "POST":
-        save_comment(request, post)
+        _create_comment(request, post)
     comment_form = CommentForm()
     context = {
         "post": post,
@@ -41,14 +42,16 @@ def post_detail(request, slug):
     return render(request, "blog/post_detail.html", context)
 
 
-def save_comment(request, post):
+def _create_comment(request, post):
     """
-    Extract a `Comment` from a request and save it to the database.
-    Adds a success message to `messages` if the save was successful.
+    Save a new comment to the database.
+
+    If the comment data is valid, a database record is created for the comment
+    and a success message is added to `messages`.
 
     Args:
-        request (HttpRequest): The HTTP request.
-        post (Post): The `Comment`'s related blog post.
+        request (HttpRequest): A request containing valid comment data.
+        post (Post): The comment's related blog post.
     """
     comment_form = CommentForm(data=request.POST)
     if comment_form.is_valid():
@@ -58,3 +61,35 @@ def save_comment(request, post):
         comment.save()
         message = "Comment submitted and awaiting approval"
         messages.add_message(request, messages.SUCCESS, message)
+
+
+def comment_edit(request, slug, comment_id):
+    """
+    Update a comment and reload post details after a comment has been edited.
+
+    If the comment data is valid and the request's user is the comment author,
+    then (a) the comment's database record is updated, (b) the comment's
+    approved status is set to false, and (c) a success message is added to
+    `messages`.
+
+    Otherwise, an error message is added to `messages`.
+
+    Args:
+        request (HTTPRequest): A HTTP request containing valid data for the
+            edited comment. The request's user is the comment's author.
+        slug (str): A URL slug containing the ID of the edited comment's post.
+        comment_id (int): The ID of the edited comment.
+    """
+    if request.method == "POST":
+        comment = get_object_or_404(Comment, pk=comment_id)
+        comment_form = CommentForm(data=request.POST, instance=comment)
+        if comment_form.is_valid() and comment.author == request.user:
+            comment = comment_form.save(commit=False)
+            comment.approved = False
+            comment.save()
+            message = "Comment updated."
+            messages.add_message(request, messages.SUCCESS, message)
+        else:
+            message = "Error updating comment."
+            messages.add_message(request, messages.ERROR, message)
+    return HttpResponseRedirect(reverse("post_detail", args=[slug]))
