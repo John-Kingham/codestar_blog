@@ -38,14 +38,8 @@ ALLOWED_HOSTS = [
 
 # Application definition
 
+# cloudinary_storage must be immediately after django.contrib.staticfiles
 INSTALLED_APPS = [
-    "about",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "blog",
-    "crispy_forms",
-    "crispy_bootstrap5",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -53,6 +47,15 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.sites",
     "django.contrib.staticfiles",
+    "cloudinary_storage",
+    "about",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "blog",
+    "cloudinary",
+    "crispy_forms",
+    "crispy_bootstrap5",
     "django_summernote",
 ]
 SITE_ID = 1

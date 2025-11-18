@@ -109,10 +109,9 @@ def comment_delete(request, slug, comment_id):
     """
     Delete a comment and then reload the post details page.
 
-    If the request's user is the comment's author, the comment's database
-    record will be deleted and a message will be added to `messages`.
-
-    Otherwise, an error message will be added to `messages`.
+    If the request's user is the comment's author, delete the comment database
+    record and add a message to `messages`. Otherwise, add an error message to
+    `messages`.
 
     Args:
         request (HTTPRequest): A request where `user` is the comment's author.
@@ -120,7 +119,7 @@ def comment_delete(request, slug, comment_id):
         comment_id (int): The comment's ID.
 
     Returns:
-        HttpResponseRedirect: Redirects to the post details page for the
+        HttpResponseRedirect: Redirect to the post details page for the
         comment's blog post.
     """
     comment = get_object_or_404(Comment, pk=comment_id)
