@@ -8,6 +8,10 @@ from .models import Comment, Post, PUBLISHED
 
 # Create your views here.
 class PostList(generic.ListView):
+    """
+    A list view for Post objects.
+    """
+
     queryset = Post.objects.filter(status=PUBLISHED)
     template_name = "blog/index.html"
     paginate_by = 6
@@ -15,29 +19,29 @@ class PostList(generic.ListView):
 
 def post_detail(request, slug):
     """
-    Display an individual :model:`blog.Post`.
+    Display a blog post and its comments.
 
-    **Context**
+    If the request's method is POST, the request must contain valid comment
+    form data for a new comment. If the comment form data is valid, a record
+    will be created in the database for the new comment.
 
-    ``post``
-        An instance of :model:`blog.Post`.
+    Args:
+        request (HttpRequest): A GET or POST request. If POST, the request must
+            contain valid comment form data.
+        slug (str): A URL slug containing the post's ID.
 
-    **Template**
-
-    :template:`blog/post_detail.html`
+    Returns:
+        HttpResponse: The result of rendering the post details template.
     """
-    queryset = Post.objects.filter(status=PUBLISHED)
-    post = get_object_or_404(queryset, slug=slug)
-    comments = post.comments.all().order_by("-created_on")
-    comment_count = post.comments.filter(approved=True).count()
+    published_posts = Post.objects.filter(status=PUBLISHED)
+    post = get_object_or_404(published_posts, slug=slug)
     if request.method == "POST":
         _create_comment(request, post)
-    comment_form = CommentForm()
     context = {
         "post": post,
-        "comments": comments,
-        "comment_count": comment_count,
-        "comment_form": comment_form,
+        "comments": post.comments.all().order_by("-created_on"),
+        "comment_count": post.comments.filter(approved=True).count(),
+        "comment_form": CommentForm(),
     }
     return render(request, "blog/post_detail.html", context)
 
@@ -47,10 +51,11 @@ def _create_comment(request, post):
     Save a new comment to the database.
 
     If the comment data is valid, a database record is created for the comment
-    and a success message is added to `messages`.
+    and a success message is added to `messages`. Otherwise, an error message
+    is added to `messages`.
 
     Args:
-        request (HttpRequest): A request containing valid comment data.
+        request (HttpRequest): A POST request containing valid comment data.
         post (Post): The comment's related blog post.
     """
     comment_form = CommentForm(data=request.POST)
@@ -61,6 +66,9 @@ def _create_comment(request, post):
         comment.save()
         message = "Comment submitted and awaiting approval"
         messages.add_message(request, messages.SUCCESS, message)
+    else:
+        message = "Error updating comment."
+        messages.add_message(request, messages.ERROR, message)
 
 
 def comment_edit(request, slug, comment_id):
@@ -75,7 +83,7 @@ def comment_edit(request, slug, comment_id):
     Otherwise, an error message is added to `messages`.
 
     Args:
-        request (HTTPRequest): A HTTP request containing valid data for the
+        request (HTTPRequest): A POST request containing valid data for the
             edited comment. The request's user is the comment's author.
         slug (str): A URL slug containing the ID of the edited comment's post.
         comment_id (int): The ID of the edited comment.
@@ -84,17 +92,16 @@ def comment_edit(request, slug, comment_id):
         HttpResponseRedirect: Redirects to the post details page for the
         comment's blog post.
     """
-    if request.method == "POST":
-        comment = get_object_or_404(Comment, pk=comment_id)
-        comment_form = CommentForm(data=request.POST, instance=comment)
-        if comment_form.is_valid() and comment.author == request.user:
-            comment = comment_form.save(commit=False)
-            comment.approved = False
-            comment.save()
-            messages.add_message(request, messages.SUCCESS, "Comment updated.")
-        else:
-            message = "Error updating comment."
-            messages.add_message(request, messages.ERROR, message)
+    comment = get_object_or_404(Comment, pk=comment_id)
+    comment_form = CommentForm(data=request.POST, instance=comment)
+    if comment_form.is_valid() and comment.author == request.user:
+        comment = comment_form.save(commit=False)
+        comment.approved = False
+        comment.save()
+        messages.add_message(request, messages.SUCCESS, "Comment updated.")
+    else:
+        message = "Error updating comment."
+        messages.add_message(request, messages.ERROR, message)
     return HttpResponseRedirect(reverse("post_detail", args=[slug]))
 
 
