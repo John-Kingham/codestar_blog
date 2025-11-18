@@ -1,3 +1,4 @@
+from cloudinary.models import CloudinaryField
 from django.db import models
 
 
@@ -5,6 +6,7 @@ from django.db import models
 class About(models.Model):
 
     title = models.CharField(max_length=200, unique=True)
+    profile_image = CloudinaryField("image", default="placeholder")
     content = models.TextField()
     updated_on = models.DateTimeField(auto_now=True)
 
