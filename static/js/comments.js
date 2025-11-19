@@ -13,7 +13,7 @@ function addEditEventListeners() {
     const submitButton = document.getElementById("submitButton");
     for (const editButton of editButtons) {
         editButton.addEventListener("click", function (e) {
-            const commentId = e.target.getAttribute("comment-id");
+            const commentId = e.target.getAttribute("data-comment-id");
             const commentText = document.getElementById(
                 `comment${commentId}`
             ).innerText;
@@ -41,7 +41,7 @@ function addDeleteEventListeners() {
     const confirmDeleteBtn = document.getElementById("deleteConfirm");
     for (const deleteBtn of deleteBtns) {
         deleteBtn.addEventListener("click", function (e) {
-            const commentId = e.target.getAttribute("comment-id");
+            const commentId = e.target.getAttribute("data-comment-id");
             confirmDeleteBtn.href = `delete_comment/${commentId}`;
             deleteModal.show();
         });

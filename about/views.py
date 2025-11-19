@@ -6,9 +6,39 @@ from .models import About
 
 # Create your views here.
 def about_view(request):
+    """
+    Return the About page and save collaboration requests.
+
+    Return the About page with the latest content. If this is a POST request,
+    the user has submitted a collaboration request, so add it to the database.
+
+    Args:
+        request (HttpRequest):
+            A GET or POST request. If the request is a POST request, it
+            contains :form:`about.CollaborateForm` data for a new collaboration
+            request.
+
+    Models:
+        :model:`about.About`
+        :model:`about.CollaborateRequest`
+
+    Template:
+        :template:`about/about.html`
+
+    context:
+        about (:model:`about.About`): The latest About content.
+        collaborate_form (:form:`about.CollaborateForm`): An empty form.
+
+    Messages:
+        SUCCESS: If the collaborate request is saved to the database.
+        ERROR: If the attempt to save the collaborate request fails.
+
+    Returns:
+        HttpResponse: Contains the about page.
+    """
     about = About.objects.first()
     if request.method == "POST":
-        save_collaboration_request(request)
+        _save_collaborate_request(request)
     collaborate_form = CollaborateForm()
     context = {
         "about": about,
@@ -17,13 +47,20 @@ def about_view(request):
     return render(request, "about/about.html", context)
 
 
-def save_collaboration_request(request):
+def _save_collaborate_request(request):
     """
-    Save a collaboration request to the database.
-    If the request is successful, send a confirmation message to `messages`.
+    Save a collaborate request to the database.
 
     Args:
-        request (HTTPRequest): The HTTP request
+        request (HttpRequest):
+            A POST request containing :form:`about.CollaborateForm` data.
+
+    Models:
+        :model:`about.CollaborateRequest`
+
+    Messages:
+        SUCCESS: If the collaborate request is saved to the database.
+        ERROR: If the attempt to save the collaborate request fails.
     """
     collaboration_form = CollaborateForm(data=request.POST)
     if collaboration_form.is_valid():
@@ -35,3 +72,6 @@ def save_collaboration_request(request):
             "within 2 working days."
         )
         messages.add_message(request, messages.SUCCESS, message)
+    else:
+        message = "Error saving your collaboration request. Please try again."
+        messages.add_message(request, messages.ERROR, message)

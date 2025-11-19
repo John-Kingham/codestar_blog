@@ -10,9 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
-from pathlib import Path
-import os
 import dj_database_url
+from django.contrib.messages import constants as messages_constants
+import os
+from pathlib import Path
 
 if os.path.isfile("env.py"):
     import env  # noqa: F401 - Ignore unreferenced import warning
@@ -163,3 +164,10 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Associate message severity with the appropriate Bootstrap classes.
+
+MESSAGE_TAGS = {
+    messages_constants.SUCCESS: "alert-success",
+    messages_constants.ERROR: "alert-danger",
+}

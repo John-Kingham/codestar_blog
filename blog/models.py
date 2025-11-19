@@ -9,6 +9,12 @@ STATUS = ((DRAFT, "Draft"), (PUBLISHED, "Published"))
 
 
 class Post(models.Model):
+    """
+    A blog post.
+
+    Related:
+        :model:`auth.User`.
+    """
     title = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=200, unique=True)
     author = models.ForeignKey(
@@ -29,6 +35,13 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
+    """
+    A user comment on a blog post.
+
+    Related:
+        :model:`auth.User`
+        :model:`blog.Post`
+    """
     post = models.ForeignKey(
         Post, on_delete=models.CASCADE, related_name="comments"
     )
